@@ -17,6 +17,12 @@ duty_cycle = 50.0  # %
 harmonic_amplitudes = [0.3, 0.6, 0.9] # V
 harmonic_frequencies = [10, 30, 50] # Hz
 harmonic_phases = [0, 0, 0] # rad
+input_old = [0]
+output_old = [0]
+time_old = [0]
+param_old = [L, C, R1, R2]
+
+
 
 def generate_signal():
     global L, C, R1, R2, T, dT, amplitude, frequency, signal_type, duty_cycle, harmonic_amplitudes, harmonic_frequencies, harmonic_phases
@@ -83,6 +89,8 @@ def calc_coefficients():
     
     return [a, b, c, d, g1, g2, g3, p1, p2, resonant_freq]
 
+K_old = calc_coefficients()
+
 def runge_kutta(U):
     K = calc_coefficients()
     length = len(U)
@@ -120,16 +128,20 @@ def runge_kutta(U):
         time.append(i * dT)
     
     return time, U[:-1], y
-
-
+time_old, input_old, output_old = runge_kutta(generate_signal())
 
 def update_params(val):
+    
     """Update all parameters from sliders"""
-    global L, C, R1, R2, amplitude, frequency, T, duty_cycle
+    global L, C, R1, R2, amplitude, frequency, T, duty_cycle, input_old, output_old, time_old, K_old, param_old
     global harmonic_amplitudes, harmonic_frequencies
     global slider_L, slider_C, slider_R1, slider_R2, slider_amp, slider_freq, slider_time
     global slider_duty_cycle, slider_h1_amp, slider_h1_freq, slider_h2_amp, slider_h2_freq, slider_h3_amp, slider_h3_freq
-    
+    if(T == slider_time.val):
+        time_old, input_old, output_old = runge_kutta(generate_signal())
+    if(T==slider_time.val and frequency == slider_freq.val and amplitude == slider_amp.val and duty_cycle == slider_duty_cycle and harmonic_amplitudes[0] == slider_h1_amp and harmonic_amplitudes[1] == slider_h2_amp and harmonic_amplitudes[2] == slider_h3_amp and harmonic_frequencies[0] == slider_h1_freq and harmonic_frequencies[1] == slider_h2_freq and harmonic_frequencies[2] == slider_h3_freq):
+        K_old = calc_coefficients()
+        param_old = [L,C,R1,R2]
     # Update from sliders
     L = slider_L.val
     C = slider_C.val
@@ -150,10 +162,12 @@ def update_params(val):
     update_plot()
 
 def update_signal_type(label):
+    
     """Update signal type from radio buttons"""
-    global signal_type
+    global signal_type, input_old, output_old, time_old
     global slider_h1_amp, slider_h1_freq, slider_h2_amp, slider_h2_freq, slider_h3_amp, slider_h3_freq
     global slider_duty_cycle
+    time_old, input_old, output_old = runge_kutta(generate_signal())
     
     signal_type = label
     
@@ -184,16 +198,20 @@ def update_signal_type(label):
 
 def plot_frequency_response():
     """Plot magnitude response in the third subplot"""
-    global ax3
+    global ax3, K_old
     K = calc_coefficients()
     w = np.logspace(-1, 3, 500)
     
     magnitude_db = []
+    magnitude_old = []
     for frequency in w:
+        mag_old = 1 / (K_old[4] * np.sqrt(frequency**4 + K_old[5] * frequency**2 + K_old[6]))
         magnitude = 1 / (K[4] * np.sqrt(frequency**4 + K[5] * frequency**2 + K[6]))
+        magnitude_old.append(20 * np.log10(mag_old))
         magnitude_db.append(20 * np.log10(magnitude))
     
     ax3.semilogx(w, magnitude_db, 'g-', linewidth=2, label='Magnitude')
+    ax3.semilogx(w, magnitude_old, 'g--', alpha=0.5, label='Magnitude')
     ax3.set_xlabel('Frequency [rad/s]')
     ax3.set_ylabel('Magnitude [dB]')
     ax3.set_title('Magnitude Response')
@@ -202,20 +220,24 @@ def plot_frequency_response():
 
 def plot_phase_response():
     """Plot phase response in the fourth subplot"""
-    global ax4
+    global ax4, param_old
     K = calc_coefficients()
     w = np.logspace(-1, 3, 500)
     
     phase_deg = []
+    phase_old = []
     for frequency in w:
         # Phase: H(s) = 1 / (LCs^2 + (L/R1 + L/R2)s + 1)
         # Phase = -arctan(Im(H)/Re(H))
         s = 1j * frequency  # s = j*omega
+        den_old = param_old[0] * param_old[1] * s**2 + (param_old[0]/param_old[2] + param_old[0]/param_old[3]) * s + 1
         denominator = L * C * s**2 + (L/R1 + L/R2) * s + 1
         phase_rad = -np.angle(denominator)
+        phase_old.append(np.degrees(-np.angle(den_old)))
         phase_deg.append(np.degrees(phase_rad))
     
     ax4.semilogx(w, phase_deg, 'm-', linewidth=2, label='Phase')
+    ax4.semilogx(w, phase_old, 'm--', alpha = 0.5, label='Phase')
     ax4.set_xlabel('Frequency [rad/s]')
     ax4.set_ylabel('Phase [degrees]')
     ax4.set_title('Phase Response')
@@ -223,7 +245,7 @@ def plot_phase_response():
     ax4.legend()
 
 def update_plot():
-    global ax1, ax2, ax3, ax4, controls_ax, L, C, R1, R2, amplitude, frequency, signal_type
+    global ax1, ax2, ax3, ax4, controls_ax, L, C, R1, R2, amplitude, frequency, signal_type, input_old, output_old, time_old
     
     U = generate_signal()
     time, input_signal, output_signal = runge_kutta(U)
@@ -235,12 +257,14 @@ def update_plot():
     
     # input plot
     ax1.plot(time, input_signal, 'b-', linewidth=2, label='Input Signal')
+    ax1.plot(time_old, input_old, 'b--', alpha = 0.5, label='Input Signal')
     ax1.set_ylabel('Amplitude [V]')
     ax1.set_title(f'Input Signal - {signal_type.title()}')
     ax1.grid(True, alpha=0.3)
     
     # output plot
     ax2.plot(time, output_signal, 'r-', linewidth=2, label='Output Signal')
+    ax2.plot(time_old, output_old, 'r--', alpha = 0.5, label='Output Signal')
     ax2.set_ylabel('Voltage [V]')
     ax2.set_title('Output Signal (Capacitor Voltage)')
     ax2.grid(True, alpha=0.3)
