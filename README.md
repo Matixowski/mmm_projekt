@@ -6,12 +6,14 @@
 
 Dany jest układ RLC
 
- --- L ------------
+ ```
+--- L ------------
  |       |   |    |
  |       |   |    |
  u       R   C    R <- y(t) = U_R
  |       |   |    |
  ------------------
+ ```
 
 gdzie R, L, C to parametry modelu a u to sygnał wejściowy. Należy zaimplementować symulator tego układu
 umożliwiając uzyskanie odpowiedzi czasowych układu na pobudzenie przynajmniej trzema
