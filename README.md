@@ -2,7 +2,7 @@
 ## Autorzy
 * Mateusz Gniado (197888)
 * Piotr Szulc (197639)
-## Treść zadania
+## Treść zadania (Projekt nr 16)
 
 Dany jest układ RLC
 

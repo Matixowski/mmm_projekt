@@ -91,7 +91,7 @@ def calc_coefficients():
 
 K_old = calc_coefficients()
 
-def runge_kutta(U):
+def runge_kutta(U): # Runge-Kutta second-order method
     K = calc_coefficients()
     length = len(U)
     
@@ -110,7 +110,6 @@ def runge_kutta(U):
         k1_x1 = K[0] * x2_curr + K[3] * u_curr
         k1_x2 = K[1] * x1_curr + K[2] * x2_curr
         
-        # Predicted values
         xp1 = x1_curr + k1_x1
         xp2 = x2_curr + k1_x2
         
@@ -118,7 +117,6 @@ def runge_kutta(U):
         k2_x1 = K[0] * xp2 + K[3] * u_next
         k2_x2 = K[1] * xp1 + K[2] * xp2
         
-        # Final integration
         x1_next = x1_curr + 0.5 * (k1_x1 + k2_x1)
         x2_next = x2_curr + 0.5 * (k1_x2 + k2_x2)
         
@@ -216,7 +214,6 @@ def plot_frequency_response():
     ax3.set_ylabel('Magnitude [dB]')
     ax3.set_title('Magnitude Response')
     ax3.grid(True, alpha=0.3)
-    ax3.legend()
 
 def plot_phase_response():
     """Plot phase response in the fourth subplot"""
@@ -242,7 +239,6 @@ def plot_phase_response():
     ax4.set_ylabel('Phase [degrees]')
     ax4.set_title('Phase Response')
     ax4.grid(True, alpha=0.3)
-    ax4.legend()
 
 def update_plot():
     global ax1, ax2, ax3, ax4, controls_ax, L, C, R1, R2, amplitude, frequency, signal_type, input_old, output_old, time_old
@@ -259,14 +255,14 @@ def update_plot():
     ax1.plot(time, input_signal, 'b-', linewidth=2, label='Input Signal')
     ax1.plot(time_old, input_old, 'b--', alpha = 0.5, label='Input Signal')
     ax1.set_ylabel('Amplitude [V]')
-    ax1.set_title(f'Input Signal - {signal_type.title()}')
+    ax1.set_title(f'Input Signal - {signal_type}')
     ax1.grid(True, alpha=0.3)
     
     # output plot
     ax2.plot(time, output_signal, 'r-', linewidth=2, label='Output Signal')
     ax2.plot(time_old, output_old, 'r--', alpha = 0.5, label='Output Signal')
     ax2.set_ylabel('Voltage [V]')
-    ax2.set_title('Output Signal (Capacitor Voltage)')
+    ax2.set_title('Output Signal')
     ax2.grid(True, alpha=0.3)
     
     # freq plot

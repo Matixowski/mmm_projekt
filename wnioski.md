@@ -1,6 +1,12 @@
 # Wnioski z pracy projektowej
 
+## Autorzy
+* Mateusz Gniado (197888)
+* Piotr Szulc (197639)
+
 ## Obliczenia
+
+[obliczenia znajdują się w pliku [wnioski_obliczenia](wnioski_obliczenia.pdf)]
 
 ### Transmitancja
 
@@ -8,15 +14,10 @@ $$\frac{Y(s)}{U(s)} = \frac{R_1R_2}{LCR_1R_2s^2 + LR_1s + LR_2 + R_1R_2}$$
 
 ### Model stanowy
 
-$$
-\begin{bmatrix}   \dot{x_1} \\ \dot{x_2}   \end{bmatrix} = 
-\begin{bmatrix}   0 & \frac{-1}{L} \\ \frac{1}{C} & -(\frac{1}{RC} + \frac{1}{R_2C})   \end{bmatrix}
-\begin{bmatrix}   x_1 \\ x_2   \end{bmatrix} + 
-\begin{bmatrix}   \frac{1}{L} \\ 0   \end{bmatrix} u(t)
-\\
-y(t) = \begin{bmatrix} 0 & 1\end{bmatrix}x + \begin{bmatrix} 0 \end{bmatrix}u(t)
-$$
+$$ \begin{bmatrix}   \dot{x_1} \\ \dot{x_2}   \end{bmatrix} =  \begin{bmatrix}   0 & \frac{-1}{L} \\ \frac{1}{C} & -(\frac{1}{RC} + \frac{1}{R_2C})   \end{bmatrix} \begin{bmatrix}   x_1 \\ x_2   \end{bmatrix} +  \begin{bmatrix}   \frac{1}{L} \\ 0   \end{bmatrix} u(t) \\ y(t) = \begin{bmatrix} 0 & 1\end{bmatrix}x + \begin{bmatrix} 0 \end{bmatrix}u(t) $$
+
 w założeniu, że $x_1 = i_L$ oraz $x_2 = U_R$
+
 
 
 ## Działanie algorytmu Rungego-Kutty
